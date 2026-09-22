@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Štědrý Výherní Automat - Zlatá Horečka</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <h1 class="game-title">✨ LUCKY SLOTS ✨</h1>
+            <p class="subtitle">Speciální edice s <span>vysokou šancí na výhru (> 55 %)</span>!</p>
+        </header>
+
+        <main class="slot-machine-wrapper">
+            <!-- Casino Machine Frame -->
+            <div class="slot-machine">
+                <div class="jackpot-banner">
+                    <span class="jackpot-title">SUPER BONUS</span>
+                    <span class="jackpot-amount" id="jackpotDisplay">10 000 KČ</span>
+                </div>
+
+                <!-- Display Window for Reels -->
+                <div class="reels-container">
+                    <div class="payline-indicator payline-left">►</div>
+                    <div class="reels-frame">
+                        <div class="reel-window" id="reel1">
+                            <div class="reel-strip">
+                                <div class="symbol">💎</div>
+                            </div>
+                        </div>
+                        <div class="reel-window" id="reel2">
+                            <div class="reel-strip">
+                                <div class="symbol">🎰</div>
+                            </div>
+                        </div>
+                        <div class="reel-window" id="reel3">
+                            <div class="reel-strip">
+                                <div class="symbol">👑</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="payline-indicator payline-right">◄</div>
+                </div>
+
+                <!-- Message / Result Display -->
+                <div class="message-banner" id="messageBanner">
+                    <div class="message-text" id="messageText">Hodně štěstí! Vyberte sázku a zatočte!</div>
+                </div>
+
+                <!-- Control Panel -->
+                <div class="control-panel">
+                    <div class="stats-card balance-card">
+                        <span class="label">VIRTUÁLNÍ KONTO</span>
+                        <div class="value-container">
+                            <span class="currency">Kč</span>
+                            <span class="value" id="balanceDisplay">1 000</span>
+                        </div>
+                    </div>
+
+                    <div class="stats-card bet-card">
+                        <span class="label">SÁZKA</span>
+                        <div class="bet-controls">
+                            <button type="button" class="btn-bet-adjust" id="btnBetMinus" aria-label="Snížit sázku">-</button>
+                            <span class="bet-value" id="betDisplay">10 Kč</span>
+                            <button type="button" class="btn-bet-adjust" id="btnBetPlus" aria-label="Zvýšit sázku">+</button>
+                        </div>
+                        <div class="quick-bets">
+                            <button type="button" class="btn-quick-bet" data-bet="10">10</button>
+                            <button type="button" class="btn-quick-bet" data-bet="50">50</button>
+                            <button type="button" class="btn-quick-bet" data-bet="100">100</button>
+                            <button type="button" class="btn-quick-bet" data-bet="500">500</button>
+                        </div>
+                    </div>
+
+                    <div class="stats-card win-card">
+                        <span class="label">POSLEDNÍ VÝHRA</span>
+                        <div class="value-container highlight-win">
+                            <span class="currency">Kč</span>
+                            <span class="value" id="lastWinDisplay">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-bar">
+                    <button type="button" class="btn-spin" id="btnSpin">
+                        <span class="spin-text">ZATOČIT</span>
+                        <span class="spin-subtext">(MEZERNÍK)</span>
+                    </button>
+                    <button type="button" class="btn-auto" id="btnAutoSpin">AUTO PLAY</button>
+                    <button type="button" class="btn-reload" id="btnReload" title="Nabit konto zdarma">➕ DOPLNIT KONTO</button>
+                    <button type="button" class="btn-sound" id="btnSound" aria-label="Přepnout zvuk">🔊</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Stats & Paytable Sections -->
+        <section class="info-grid">
+            <!-- Game Statistics -->
+            <div class="info-card">
+                <h2>📊 Statistiky Hry</h2>
+                <div class="stats-list">
+                    <div class="stat-row">
+                        <span>Počet zatočení:</span>
+                        <strong id="statSpins">0</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Výherní zatočení:</span>
+                        <strong id="statWins">0</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Aktuální úspěšnost:</span>
+                        <strong id="statWinRate" class="text-success">0.0 %</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Cílová šance na výhru:</span>
+                        <strong class="text-gold">&gt; 55 % (Garance)</strong>
+                    </div>
+                    <div class="stat-row">
+                        <span>Celkově vyhráno:</span>
+                        <strong id="statTotalWon">0 Kč</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paytable -->
+            <div class="info-card">
+                <h2>🏆 Výherní Tabulka (Násobky Sázky)</h2>
+                <div class="paytable-grid">
+                    <div class="paytable-item">
+                        <span class="symbols-combo">💎 💎 💎</span>
+                        <span class="multiplier gold">100x (JACKPOT)</span>
+                    </div>
+                    <div class="paytable-item">
+                        <span class="symbols-combo">🎰 🎰 🎰</span>
+                        <span class="multiplier">25x</span>
+                    </div>
+                    <div class="paytable-item">
+                        <span class="symbols-combo">👑 👑 👑</span>
+                        <span class="multiplier">15x</span>
+                    </div>
+                    <div class="paytable-item">
+                        <span class="symbols-combo">🔔 🔔 🔔</span>
+                        <span class="multiplier">10x</span>
+                    </div>
+                    <div class="paytable-item">
+                        <span class="symbols-combo">⭐ ⭐ ⭐</span>
+                        <span class="multiplier">5x</span>
+                    </div>
+                    <div class="paytable-item">
+                        <span class="symbols-combo">🍋 🍋 🍋</span>
+                        <span class="multiplier">3x</span>
+                    </div>
+                    <div class="paytable-item">
+                        <span class="symbols-combo">🍒 🍒 🍒</span>
+                        <span class="multiplier">2x</span>
+                    </div>
+                    <div class="paytable-item">
+                        <span class="symbols-combo">Ajakékoliv 2 stejné</span>
+                        <span class="multiplier mini">1.5x (MINI VÝHRA)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>Virtuální kasino - pouze pro zábavu. Žádné reálné peníze nejsou používány.</p>
+        </footer>
+    </div>
+
+    <!-- Win Canvas Effect overlay -->
+    <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+    <script src="app.js"></script>
+</body>
+</html>
