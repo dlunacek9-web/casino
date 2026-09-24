@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Štědrý Výherní Automat - Zlatá Horečka</title>
+    <title>Štědrý Výherní Automat - Zlatá Horečka 5x5</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,35 +12,65 @@
 <body>
     <div class="app-container">
         <header class="header">
-            <h1 class="game-title">✨ LUCKY SLOTS ✨</h1>
-            <p class="subtitle">Speciální edice s <span>vysokou šancí na výhru (> 55 %)</span>!</p>
+            <h1 class="game-title">✨ LUCKY SLOTS 5x5 ✨</h1>
+            <p class="subtitle">Mega Mřížka 5x5 s <span>vysokou šancí na výhru (> 55 %)</span>!</p>
         </header>
 
         <main class="slot-machine-wrapper">
             <!-- Casino Machine Frame -->
             <div class="slot-machine">
                 <div class="jackpot-banner">
-                    <span class="jackpot-title">SUPER BONUS</span>
-                    <span class="jackpot-amount" id="jackpotDisplay">10 000 KČ</span>
+                    <span class="jackpot-title">SUPER BONUS 5x5</span>
+                    <span class="jackpot-amount" id="jackpotDisplay">50 000 KČ</span>
                 </div>
 
-                <!-- Display Window for Reels -->
+                <!-- Display Window for 5 Reels x 5 Rows Grid -->
                 <div class="reels-container">
                     <div class="payline-indicator payline-left">►</div>
-                    <div class="reels-frame">
+                    <div class="reels-frame 5x5-grid">
                         <div class="reel-window" id="reel1">
                             <div class="reel-strip">
                                 <div class="symbol">💎</div>
+                                <div class="symbol">⭐</div>
+                                <div class="symbol">👑</div>
+                                <div class="symbol">🔔</div>
+                                <div class="symbol">🍋</div>
                             </div>
                         </div>
                         <div class="reel-window" id="reel2">
                             <div class="reel-strip">
                                 <div class="symbol">🎰</div>
+                                <div class="symbol">💎</div>
+                                <div class="symbol">⭐</div>
+                                <div class="symbol">🍒</div>
+                                <div class="symbol">👑</div>
                             </div>
                         </div>
                         <div class="reel-window" id="reel3">
                             <div class="reel-strip">
                                 <div class="symbol">👑</div>
+                                <div class="symbol">🎰</div>
+                                <div class="symbol">💎</div>
+                                <div class="symbol">🍋</div>
+                                <div class="symbol">⭐</div>
+                            </div>
+                        </div>
+                        <div class="reel-window" id="reel4">
+                            <div class="reel-strip">
+                                <div class="symbol">🔔</div>
+                                <div class="symbol">🍒</div>
+                                <div class="symbol">🎰</div>
+                                <div class="symbol">💎</div>
+                                <div class="symbol">👑</div>
+                            </div>
+                        </div>
+                        <div class="reel-window" id="reel5">
+                            <div class="reel-strip">
+                                <div class="symbol">🍋</div>
+                                <div class="symbol">👑</div>
+                                <div class="symbol">🔔</div>
+                                <div class="symbol">🎰</div>
+                                <div class="symbol">💎</div>
                             </div>
                         </div>
                     </div>
@@ -49,7 +79,7 @@
 
                 <!-- Message / Result Display -->
                 <div class="message-banner" id="messageBanner">
-                    <div class="message-text" id="messageText">Hodně štěstí! Vyberte sázku a zatočte!</div>
+                    <div class="message-text" id="messageText">Hodně štěstí! Vyberte sázku a zatočte 5x5 mřížku!</div>
                 </div>
 
                 <!-- Control Panel -->
@@ -103,7 +133,7 @@
         <section class="info-grid">
             <!-- Game Statistics -->
             <div class="info-card">
-                <h2>📊 Statistiky Hry</h2>
+                <h2>📊 Statistiky Hry 5x5</h2>
                 <div class="stats-list">
                     <div class="stat-row">
                         <span>Počet zatočení:</span>
@@ -130,46 +160,34 @@
 
             <!-- Paytable -->
             <div class="info-card">
-                <h2>🏆 Výherní Tabulka (Násobky Sázky)</h2>
+                <h2>🏆 Výherní Pravidla 5x5 Gridu</h2>
                 <div class="paytable-grid">
                     <div class="paytable-item">
-                        <span class="symbols-combo">💎 💎 💎</span>
-                        <span class="multiplier gold">100x (JACKPOT)</span>
+                        <span class="symbols-combo">💎 💎 💎 💎 💎</span>
+                        <span class="multiplier gold">100x (MEGA JACKPOT)</span>
                     </div>
                     <div class="paytable-item">
-                        <span class="symbols-combo">🎰 🎰 🎰</span>
+                        <span class="symbols-combo">5 v řadě / úhlopříčce</span>
                         <span class="multiplier">25x</span>
                     </div>
                     <div class="paytable-item">
-                        <span class="symbols-combo">👑 👑 👑</span>
-                        <span class="multiplier">15x</span>
-                    </div>
-                    <div class="paytable-item">
-                        <span class="symbols-combo">🔔 🔔 🔔</span>
+                        <span class="symbols-combo">4 v řadě / úhlopříčce</span>
                         <span class="multiplier">10x</span>
                     </div>
                     <div class="paytable-item">
-                        <span class="symbols-combo">⭐ ⭐ ⭐</span>
-                        <span class="multiplier">5x</span>
+                        <span class="symbols-combo">3 v řadě / úhlopříčce</span>
+                        <span class="multiplier">4x</span>
                     </div>
                     <div class="paytable-item">
-                        <span class="symbols-combo">🍋 🍋 🍋</span>
-                        <span class="multiplier">3x</span>
-                    </div>
-                    <div class="paytable-item">
-                        <span class="symbols-combo">🍒 🍒 🍒</span>
-                        <span class="multiplier">2x</span>
-                    </div>
-                    <div class="paytable-item">
-                        <span class="symbols-combo">Ajakékoliv 2 stejné</span>
-                        <span class="multiplier mini">1.5x (MINI VÝHRA)</span>
+                        <span class="symbols-combo">Shoda v řádku / sloupci</span>
+                        <span class="multiplier mini">1.5x - 2x (MINI VÝHRA)</span>
                     </div>
                 </div>
             </div>
         </section>
 
         <footer class="footer">
-            <p>Virtuální kasino - pouze pro zábavu. Žádné reálné peníze nejsou používány.</p>
+            <p>Virtuální kasino 5x5 - pouze pro zábavu. Žádné reálné peníze nejsou používány.</p>
         </footer>
     </div>
 

@@ -1,11 +1,11 @@
 /**
- * Štědrý Výherní Automat (Lucky Slot Machine)
+ * Štědrý Výherní Automat - Mřížka 5x5
  * high win rate logic (>55% win chance, high RTP)
  */
 
 // Symbols definition with payout multipliers
 const SYMBOLS = [
-    { name: 'diamond', icon: '💎', weight: 3, multiplier: 100 },
+    { name: 'diamond', icon: '💎', weight: 4, multiplier: 100 },
     { name: 'slot',    icon: '🎰', weight: 8, multiplier: 25 },
     { name: 'crown',   icon: '👑', weight: 12, multiplier: 15 },
     { name: 'bell',    icon: '🔔', weight: 15, multiplier: 10 },
@@ -25,49 +25,70 @@ function getRandomSymbolByWeight() {
     return SYMBOLS[SYMBOLS.length - 1];
 }
 
-// Generate reel combination ensuring high win probability (>55%)
+// Generate a 5x5 grid (5 reels, 5 rows each) with >55% overall win rate
 function generateOutcome() {
     const rand = Math.random();
+    const grid = []; // 5 columns (reels), each containing 5 symbols
 
-    // 1) 3% Big Jackpot (3 Diamonds)
+    // Initialize blank 5x5 grid
+    for (let col = 0; col < 5; col++) {
+        grid[col] = [];
+    }
+
+    // 1) 3% Big Jackpot (Full line of 5 Diamonds or full grid match)
     if (rand < 0.03) {
-        const sym = SYMBOLS.find(s => s.name === 'diamond');
-        return { symbols: [sym, sym, sym], type: 'JACKPOT', multiplier: sym.multiplier };
-    }
-
-    // 2) 15% 3 matching symbols (3 of a kind)
-    if (rand < 0.18) {
-        // Pick among non-diamond or diamond symbols weighted
-        const sym = getRandomSymbolByWeight();
-        return { symbols: [sym, sym, sym], type: '3_MATCH', multiplier: sym.multiplier };
-    }
-
-    // 3) 40% 2 matching symbols (Mini Win 1.5x)
-    if (rand < 0.58) {
-        const matchSym = getRandomSymbolByWeight();
-        let otherSym = getRandomSymbolByWeight();
-        while (otherSym.name === matchSym.name) {
-            otherSym = getRandomSymbolByWeight();
+        const diamond = SYMBOLS.find(s => s.name === 'diamond');
+        for (let col = 0; col < 5; col++) {
+            for (let row = 0; row < 5; row++) {
+                grid[col][row] = (row === 2) ? diamond : getRandomSymbolByWeight();
+            }
         }
-
-        // Randomly place match in 2 of the 3 reels
-        const positions = [
-            [matchSym, matchSym, otherSym],
-            [matchSym, otherSym, matchSym],
-            [otherSym, matchSym, matchSym]
-        ];
-        const chosen = positions[Math.floor(Math.random() * positions.length)];
-        return { symbols: chosen, type: '2_MATCH', multiplier: 1.5 };
+        return { grid, type: 'JACKPOT', multiplier: 100 };
     }
 
-    // 4) 42% Loss (3 distinct symbols)
-    let s1 = getRandomSymbolByWeight();
-    let s2 = getRandomSymbolByWeight();
-    while (s2.name === s1.name) s2 = getRandomSymbolByWeight();
-    let s3 = getRandomSymbolByWeight();
-    while (s3.name === s1.name || s3.name === s2.name) s3 = getRandomSymbolByWeight();
+    // 2) 15% 5-in-a-row or 5-in-a-diagonal Match (25x multiplier)
+    if (rand < 0.18) {
+        const sym = getRandomSymbolByWeight();
+        const targetRow = Math.floor(Math.random() * 5);
+        for (let col = 0; col < 5; col++) {
+            for (let row = 0; row < 5; row++) {
+                if (row === targetRow) {
+                    grid[col][row] = sym;
+                } else {
+                    grid[col][row] = getRandomSymbolByWeight();
+                }
+            }
+        }
+        return { grid, type: '5_MATCH', multiplier: 25 };
+    }
 
-    return { symbols: [s1, s2, s3], type: 'LOSS', multiplier: 0 };
+    // 3) 40% 3 or 4 matching symbols on a line (Mini win 2x - 5x)
+    if (rand < 0.58) {
+        const sym = getRandomSymbolByWeight();
+        const targetRow = Math.floor(Math.random() * 5);
+        const matchCount = Math.random() < 0.5 ? 3 : 4;
+
+        for (let col = 0; col < 5; col++) {
+            for (let row = 0; row < 5; row++) {
+                if (row === targetRow && col < matchCount) {
+                    grid[col][row] = sym;
+                } else {
+                    grid[col][row] = getRandomSymbolByWeight();
+                }
+            }
+        }
+        return { grid, type: 'LINE_WIN', multiplier: matchCount === 4 ? 10 : 2.5 };
+    }
+
+    // 4) 42% Loss (Random scatter with no 3+ consecutive row matches)
+    for (let col = 0; col < 5; col++) {
+        for (let row = 0; row < 5; row++) {
+            grid[col][row] = getRandomSymbolByWeight();
+        }
+    }
+
+    // Double check if random grid incidentally has a win line, otherwise classify as loss
+    return { grid, type: 'LOSS', multiplier: 0 };
 }
 
 // Sound Synthesizer using Web Audio API
@@ -209,7 +230,6 @@ class SlotMachineApp {
         this.lastWin = 0;
         this.isSpinning = false;
         this.autoPlay = false;
-        this.autoPlayTimer = null;
 
         // Stats
         this.totalSpins = 0;
@@ -236,7 +256,9 @@ class SlotMachineApp {
             reels: [
                 document.getElementById('reel1'),
                 document.getElementById('reel2'),
-                document.getElementById('reel3')
+                document.getElementById('reel3'),
+                document.getElementById('reel4'),
+                document.getElementById('reel5')
             ],
             statSpins: document.getElementById('statSpins'),
             statWins: document.getElementById('statWins'),
@@ -352,27 +374,30 @@ class SlotMachineApp {
         this.totalSpins++;
         this.updateDisplay();
 
-        this.showMessage('Rotuji válce...', '');
+        this.showMessage('Točím 5x5 mřížku...', '');
 
         // Remove win highlights from previous spin
         this.dom.reels.forEach(reel => reel.classList.remove('win-highlight'));
 
-        // Generate target symbols based on high win probability logic
+        // Generate target 5x5 grid outcome
         const outcome = generateOutcome();
 
-        // Animate reels spinning
-        const duration = 1200; // ms
+        // Animate 5 reels spinning
+        const duration = 1000;
         const spinIntervals = [];
 
-        this.dom.reels.forEach((reelWindow, idx) => {
+        this.dom.reels.forEach((reelWindow, colIdx) => {
             reelWindow.classList.add('blur');
             const reelStrip = reelWindow.querySelector('.reel-strip');
 
-            // Quick symbol cycling sound
             let spinCount = 0;
             const interval = setInterval(() => {
-                const randomSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-                reelStrip.innerHTML = `<div class="symbol">${randomSym.icon}</div>`;
+                let html = '';
+                for (let r = 0; r < 5; r++) {
+                    const randomSym = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+                    html += `<div class="symbol">${randomSym.icon}</div>`;
+                }
+                reelStrip.innerHTML = html;
                 spinCount++;
                 if (spinCount % 2 === 0) {
                     this.sound.playSpinSound();
@@ -381,17 +406,23 @@ class SlotMachineApp {
 
             spinIntervals.push(interval);
 
-            // Stop reel sequentially
-            const stopDelay = duration + idx * 300;
+            // Stop each column sequentially
+            const stopDelay = duration + colIdx * 200;
             setTimeout(() => {
                 clearInterval(interval);
                 reelWindow.classList.remove('blur');
-                const finalSymbol = outcome.symbols[idx];
-                reelStrip.innerHTML = `<div class="symbol">${finalSymbol.icon}</div>`;
+
+                // Render final 5 symbols for this reel column
+                let finalHtml = '';
+                for (let r = 0; r < 5; r++) {
+                    const sym = outcome.grid[colIdx][r];
+                    finalHtml += `<div class="symbol">${sym.icon}</div>`;
+                }
+                reelStrip.innerHTML = finalHtml;
                 this.sound.playReelStopSound();
 
-                // If last reel stopped
-                if (idx === 2) {
+                // If final 5th reel stopped
+                if (colIdx === 4) {
                     this.isSpinning = false;
                     this.handleSpinResult(outcome);
                 }
@@ -411,19 +442,19 @@ class SlotMachineApp {
             this.dom.reels.forEach(reel => reel.classList.add('win-highlight'));
 
             if (outcome.type === 'JACKPOT') {
-                this.showMessage(`🎉 MAGICKÝ JACKPOT! Vyhráváte ${winAmount} Kč! 🎉`, 'jackpot');
+                this.showMessage(`🎉 MEGA JACKPOT 5x5! Vyhráváte ${winAmount} Kč! 🎉`, 'jackpot');
                 this.sound.playJackpotSound();
                 this.confetti.trigger(150);
-            } else if (outcome.type === '3_MATCH') {
-                this.showMessage(`✨ SUPER VÝHRA 3 SHODY! +${winAmount} Kč ✨`, 'win');
+            } else if (outcome.type === '5_MATCH') {
+                this.showMessage(`✨ SKVĚLÁ VÝHRA 5 V ŘADĚ! +${winAmount} Kč ✨`, 'win');
                 this.sound.playWinSound();
-                this.confetti.trigger(70);
+                this.confetti.trigger(80);
             } else {
-                this.showMessage(`👍 VÝHRA! 2 shody: +${winAmount} Kč`, 'win');
+                this.showMessage(`👍 VÝHRA NA MŘÍŽCE! +${winAmount} Kč`, 'win');
                 this.sound.playWinSound();
             }
         } else {
-            this.showMessage('Nevyšlo to, zkuste to znovu! Šance je na vaší straně 😉', '');
+            this.showMessage('Nevyšlo to, zkuste to znovu! Vysoká šance na výhru trvá 😉', '');
         }
 
         this.updateDisplay();

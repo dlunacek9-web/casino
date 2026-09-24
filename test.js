@@ -1,7 +1,7 @@
 const { generateOutcome, SYMBOLS } = require('./app.js');
 
 function runSimulation(numSpins = 10000) {
-    console.log(`=== SPUŠTĚNÍ SIMULACE ${numSpins} ZATOČENÍ ===\n`);
+    console.log(`=== SPUŠTĚNÍ SIMULACE 5x5 MŘÍŽKY (${numSpins} ZATOČENÍ) ===\n`);
 
     let wins = 0;
     let totalBet = 0;
@@ -9,22 +9,28 @@ function runSimulation(numSpins = 10000) {
     const bet = 10;
 
     let jackpots = 0;
-    let match3 = 0;
-    let match2 = 0;
+    let match5 = 0;
+    let lineWins = 0;
     let losses = 0;
 
     for (let i = 0; i < numSpins; i++) {
         totalBet += bet;
         const result = generateOutcome();
 
+        // Basic verification that grid is 5x5
+        if (result.grid.length !== 5 || result.grid[0].length !== 5) {
+            console.error('❌ CHYBA: Grid nemá rozměr 5x5!');
+            process.exit(1);
+        }
+
         if (result.type === 'JACKPOT') {
             jackpots++;
             wins++;
-        } else if (result.type === '3_MATCH') {
-            match3++;
+        } else if (result.type === '5_MATCH') {
+            match5++;
             wins++;
-        } else if (result.type === '2_MATCH') {
-            match2++;
+        } else if (result.type === 'LINE_WIN') {
+            lineWins++;
             wins++;
         } else {
             losses++;
@@ -36,26 +42,26 @@ function runSimulation(numSpins = 10000) {
     const winPercentage = (wins / numSpins) * 100;
     const rtp = (totalPayout / totalBet) * 100;
 
-    console.log(`Výsledky po ${numSpins} zatočeních:`);
+    console.log(`Výsledky 5x5 mřížky po ${numSpins} zatočeních:`);
     console.log(` - Výherní zatočení: ${wins} / ${numSpins} (${winPercentage.toFixed(2)} %)`);
     console.log(` - Proherní zatočení: ${losses} / ${numSpins} (${((losses / numSpins) * 100).toFixed(2)} %)`);
-    console.log(` - Počet Jackpotů (3x Diamant): ${jackpots}`);
-    console.log(` - Počet 3 Shody: ${match3}`);
-    console.log(` - Počet 2 Shody: ${match2}`);
+    console.log(` - Počet Jackpotů: ${jackpots}`);
+    console.log(` - Počet 5 v řadě: ${match5}`);
+    console.log(` - Počet Line wins (3-4 v řadě): ${lineWins}`);
     console.log(` - Celkem vsazeno: ${totalBet} Kč`);
     console.log(` - Celkem vyplaceno: ${totalPayout} Kč`);
     console.log(` - Návratnost pro hráče (RTP): ${rtp.toFixed(2)} %\n`);
 
     // Verification Assertions
     if (winPercentage <= 50) {
-        console.error('❌ CHYBA: Šance na výhru je menší než nebo rovna 50 %!');
+        console.error('❌ CHYBA: Šance na výhru u 5x5 je menší než nebo rovna 50 %!');
         process.exit(1);
     } else {
-        console.log('✅ TEST PROŠEL: Šance na výhru je vyšší než prohra (> 50 %).');
+        console.log('✅ TEST PROŠEL: Šance na výhru u 5x5 mřížky je vyšší než prohra (> 50 %).');
     }
 
     if (rtp <= 100) {
-        console.error('❌ CHYBA: RTP je menší než 100 %!');
+        console.error('❌ CHYBA: RTP u 5x5 je menší než 100 %!');
         process.exit(1);
     } else {
         console.log('✅ TEST PROŠEL: Hráč má v průměru zisk (RTP > 100 %).');
